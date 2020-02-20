@@ -14,6 +14,8 @@ const DATA = {
     deadlinePercent: [20, 17, 15]
 };
 
+const DAY_STRING = ['день', 'дня', 'дней'];
+
 const startButton = document.querySelector('.start-button'),
     firstScreen = document.querySelector('.first-screen'),
     formCalculate = document.querySelector('.form-calculate'),
@@ -21,9 +23,19 @@ const startButton = document.querySelector('.start-button'),
     blockTotal = document.querySelector('.total'),
     totalPriceSum = document.querySelector('.total_price__sum'),
     fastRange = document.querySelector('.fast-range'),
-    desktopTemplates = document.querySelector('#desktopTemplates'),
-    mobileTemplates = document.querySelector('#mobileTemplates'),
-    mainForm = document.querySelector('.main-form');
+    desktopTemplates = document.getElementById('desktopTemplates'),
+    mobileTemplates = document.getElementById('mobileTemplates'),
+    typeSite = document.querySelector('.type-site'),
+    mainForm = document.querySelector('.main-form'),
+    rangeDeadline = document.querySelector('.range-deadline'),
+    deadlineValue = document.querySelector('.deadline-value'),
+    maxDeadline = document.querySelector('.max-deadline');
+
+// Функция склоняет слова от количества (3 варианта)
+function declOfNum(n, titles) {
+    return n + ' ' + titles[n % 10 === 1 && n % 100 !== 11 ?
+                            0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2];
+    }
 
 function showElem(elem) {
     elem.style.display = 'block';
@@ -37,17 +49,30 @@ function yesNoSwitcher(elem) {
     const yesNoElement = document.querySelector(`.${elem.id}_value`)
     if ( yesNoElement !== null) {
         if (elem.checked) {
-            yesNoElement.innerText = 'Да';
+            yesNoElement.textContent = 'Да';
         } else {
-            yesNoElement.innerText = 'Нет';
+            yesNoElement.textContent = 'Нет';
         }
     }
+}
+
+const renderTextContent = (total, site, minDay, maxDay) => {
+    
+    totalPriceSum.textContent = total;
+    typeSite.textContent = site;
+    maxDeadline.textContent = declOfNum(maxDay, DAY_STRING);
+    rangeDeadline.min = minDay;
+    rangeDeadline.max = maxDay;
+    deadlineValue.textContent = declOfNum(rangeDeadline.value,  DAY_STRING)
 }
 
 function priceCalculate(elem) {
     let result = 0,
         index = 0,
-        options = [];
+        options = [],
+        site = '',
+        minDeadlineDay = DATA.deadlineDay[index][0],
+        maxDeadlineDay = DATA.deadlineDay[index][1];
 
     if (elem.name === 'whichSite') {
         for (const item of formCalculate.elements) {
@@ -61,7 +86,10 @@ function priceCalculate(elem) {
 
     for (const item of formCalculate.elements) {
         if (item.name === 'whichSite' && item.checked) {
-            index = DATA.whichSite.indexOf(item.value);        
+            index = DATA.whichSite.indexOf(item.value);   
+            site = item.dataset.site; 
+            maxDeadlineDay = DATA.deadlineDay[index][1];
+            minDeadlineDay = DATA.deadlineDay[index][0];
         } else if (item.classList.contains('calc-handler') && item.checked) {
             options.push(item.value);
         }
@@ -84,7 +112,8 @@ function priceCalculate(elem) {
     })
 
     result += DATA.price[index];
-    totalPriceSum.textContent = result;
+
+    renderTextContent(result, site, minDeadlineDay, maxDeadlineDay);
 }
 
 function handlerCallBackForm(event) {
@@ -101,7 +130,7 @@ function handlerCallBackForm(event) {
             } else {
                 mobileTemplates.checked = false;
                 mobileTemplates.disabled = true;
-                document.querySelector('.mobileTemplates_value').innerText = 'Нет';
+                document.querySelector('.mobileTemplates_value').textContent = 'Нет';
             }
         }
         yesNoSwitcher(target);
