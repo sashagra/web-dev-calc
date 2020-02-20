@@ -33,6 +33,17 @@ function hideElem(elem) {
     elem.style.display = 'none';
 }
 
+function yesNoSwitcher(elem) {
+    const yesNoElement = document.querySelector(`.${elem.id}_value`)
+    if ( yesNoElement !== null) {
+        if (elem.checked) {
+            yesNoElement.innerText = 'Да';
+        } else {
+            yesNoElement.innerText = 'Нет';
+        }
+    }
+}
+
 function priceCalculate(elem) {
     let result = 0,
         index = 0,
@@ -90,9 +101,10 @@ function handlerCallBackForm(event) {
             } else {
                 mobileTemplates.checked = false;
                 mobileTemplates.disabled = true;
+                document.querySelector('.mobileTemplates_value').innerText = 'Нет';
             }
         }
-
+        yesNoSwitcher(target);
         priceCalculate(target);
     }
 }
