@@ -2,7 +2,7 @@
   "name": "web-dev-calc",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
     "start": "browser-sync start --server --port 3000 --no-notify reload --files='**/*'"
   },
